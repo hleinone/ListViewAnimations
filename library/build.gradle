@@ -1,13 +1,23 @@
 apply plugin:'android-library'
 
+group "com.haarman.listviewanimations"
+version "2.5.1-SNAPSHOT"
+
 dependencies {
-    compile 'com.android.support:support-v4:18.0.0'
-    compile 'com.nineoldandroids:library:2.4.+'
+    compile 'com.android.support:support-v4:19.0.0'
+    compile 'com.nineoldandroids:library:2.4.0'
 }
 
 android {
-    compileSdkVersion 18
-    buildToolsVersion '18.0.1'
+    compileSdkVersion 19
+    buildToolsVersion "19"
+
+    defaultConfig {
+        versionName "2.5.1"
+        versionCode 201310141
+        minSdkVersion 8
+        targetSdkVersion 19
+    }
 
     sourceSets {
         main {
@@ -16,6 +26,27 @@ android {
             resources.srcDirs = ['src']
             res.srcDirs = ['res']
             assets.srcDirs = ['assets']
+        }
+    }
+}
+ 
+apply plugin: "maven-publish"
+ 
+android.libraryVariants
+publishing {
+    publications {
+        androidLibrary(MavenPublication) {
+            artifact "build/libs/" + project.name + "-" + project.version + ".aar"
+            println project.configurations.default
+            pom.withXml {
+                nodeDependencies = asNode().appendNode("dependencies") 
+                project.configurations.default.allDependencies.each { dep ->
+                    nodeDependency = nodeDependencies.appendNode("dependency")
+                    nodeDependency.appendNode("groupId", dep.group)
+                    nodeDependency.appendNode("artifactId", dep.name)
+                    nodeDependency.appendNode("version", dep.version)
+                }
+            }
         }
     }
 }
